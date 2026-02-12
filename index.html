@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Saisie Scores Sports</title>
+    <!-- Tailwind CSS pour un design rapide et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Force l'application à ne pas scroller et à prendre tout l'écran */
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation; /* Améliore la réponse tactile */
+        }
+        /* Style des inputs pour qu'ils soient lisibles sur mobile */
+        select, input {
+            background-color: #1e293b; /* slate-800 */
+            color: white;
+            border: 1px solid #475569;
+        }
+        /* Effet de clic sur les boutons */
+        .btn-active:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans h-full flex flex-col">
+
+    <!-- ZONE A : EN-TÊTE (Paramètres) -->
+    <!-- Utilisation de grid pour optimiser l'espace vertical -->
+    <header class="p-2 bg-slate-800 border-b border-slate-700 shadow-md z-10 shrink-0">
+        <div class="grid grid-cols-2 gap-2 text-sm mb-2">
+            <!-- Activité -->
+            <select id="activite" class="w-full p-2 rounded rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled selected>Activité...</option>
+                <option value="Basket-ball">Basket-ball</option>
+                <option value="Handball">Handball</option>
+                <option value="Volley-ball">Volley-ball</option>
+                <option value="Futsal">Futsal</option>
+                <option value="Ultimate">Ultimate</option>
+                <option value="Badminton">Badminton</option>
+                <option value="Tennis de table">Tennis de table</option>
+            </select>
+
+            <!-- Classe -->
+            <select id="classe" class="w-full p-2 rounded rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="" disabled selected>Classe...</option>
+                <!-- 6ème -->
+                <option value="6e 1">6e 1</option><option value="6e 2">6e 2</option><option value="6e 3">6e 3</option><option value="6e 4">6e 4</option>
+                <!-- 5ème -->
+                <option value="5e 1">5e 1</option><option value="5e 2">5e 2</option><option value="5e 3">5e 3</option><option value="5e 4">5e 4</option>
+                <!-- 4ème -->
+                <option value="4e 1">4e 1</option><option value="4e 2">4e 2</option><option value="4e 3">4e 3</option><option value="4e 4">4e 4</option>
+                <!-- 3ème -->
+                <option value="3e 1">3e 1</option><option value="3e 2">3e 2</option><option value="3e 3">3e 3</option><option value="3e 4">3e 4</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-sm">
+            <!-- Date -->
+            <input type="date" id="dateSeance" class="w-full p-2 rounded rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            
+            <!-- Valeur Bonus -->
+            <div class="flex items-center space-x-2 bg-slate-700 rounded rounded-lg px-2">
+                <label class="text-xs text-gray-300 whitespace-nowrap">Val. Bonus:</label>
+                <select id="valeurBonus" class="w-full p-1 bg-transparent border-none focus:ring-0 text-center font-bold text-yellow-400">
+                    <option value="-1">-1</option>
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- ZONE B & C : CORPS (Joueurs) -->
+    <!-- Flex row pour séparer l'écran en deux verticalement -->
+    <main class="flex-1 flex overflow-hidden relative">
+        
+        <!-- SÉPARATEUR VERTICAL -->
+        <div class="absolute left-1/2 top-0 bottom-0 w-px bg-slate-600 transform -translate-x-1/2 z-0"></div>
+
+        <!-- JOUEUR 1 (GAUCHE) -->
+        <div class="w-1/2 flex flex-col p-2 border-r border-slate-700/50 z-10">
+            <!-- Nom -->
+            <input type="text" id="nomJ1" placeholder="Nom Joueur 1" class="w-full p-2 mb-2 rounded text-center font-semibold bg-blue-900/30 border-blue-500/50 focus:border-blue-500">
+            
+            <!-- Boutons d'action (Prennent toute la place disponible) -->
+            <div class="flex-1 flex flex-col gap-2 mb-2">
+                <button onclick="addPoint(1, 1)" class="btn-active flex-1 bg-blue-600 hover:bg-blue-500 rounded-xl text-3xl font-bold shadow-lg flex items-center justify-center transition">
+                    +1
+                </button>
+                <button onclick="addBonus(1)" class="btn-active h-16 bg-yellow-600 hover:bg-yellow-500 rounded-xl text-xl font-bold shadow-lg flex items-center justify-center transition text-yellow-100">
+                    Bonus
+                </button>
+            </div>
+
+            <!-- Affichage Scores -->
+            <div class="bg-slate-800 p-2 rounded-lg text-center space-y-1">
+                <div class="flex justify-between items-center text-xs text-gray-400">
+                    <span>Pts Bonus:</span>
+                    <span id="displayBonusJ1" class="text-yellow-400 font-bold text-lg">0</span>
+                </div>
+                <div class="border-t border-slate-600 pt-1">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score Total</div>
+                    <div id="displayScoreJ1" class="text-4xl font-black text-white">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JOUEUR 2 (DROITE) -->
+        <div class="w-1/2 flex flex-col p-2 z-10">
+            <!-- Nom -->
+            <input type="text" id="nomJ2" placeholder="Nom Joueur 2" class="w-full p-2 mb-2 rounded text-center font-semibold bg-red-900/30 border-red-500/50 focus:border-red-500">
+            
+            <!-- Boutons d'action -->
+            <div class="flex-1 flex flex-col gap-2 mb-2">
+                <button onclick="addPoint(2, 1)" class="btn-active flex-1 bg-red-600 hover:bg-red-500 rounded-xl text-3xl font-bold shadow-lg flex items-center justify-center transition">
+                    +1
+                </button>
+                <button onclick="addBonus(2)" class="btn-active h-16 bg-yellow-600 hover:bg-yellow-500 rounded-xl text-xl font-bold shadow-lg flex items-center justify-center transition text-yellow-100">
+                    Bonus
+                </button>
+            </div>
+
+            <!-- Affichage Scores -->
+            <div class="bg-slate-800 p-2 rounded-lg text-center space-y-1">
+                <div class="flex justify-between items-center text-xs text-gray-400">
+                    <span>Pts Bonus:</span>
+                    <span id="displayBonusJ2" class="text-yellow-400 font-bold text-lg">0</span>
+                </div>
+                <div class="border-t border-slate-600 pt-1">
+                    <div class="text-xs text-gray-400 uppercase tracking-wider">Score Total</div>
+                    <div id="displayScoreJ2" class="text-4xl font-black text-white">0</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ZONE D : PIED DE PAGE (Actions Globales) -->
+    <footer class="p-3 bg-slate-800 border-t border-slate-700 shrink-0 grid grid-cols-4 gap-3">
+        <button onclick="resetAll()" class="col-span-1 bg-gray-600 hover:bg-gray-500 text-white p-3 rounded-lg font-bold flex flex-col items-center justify-center text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/></svg>
+            <span class="mt-1">RAZ</span>
+        </button>
+        
+        <button onclick="sendData()" id="btnSave" class="col-span-3 bg-emerald-600 hover:bg-emerald-500 text-white p-3 rounded-lg font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+            <span>Enregistrer</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </button>
+    </footer>
+
+    <!-- LOGIQUE JAVASCRIPT -->
+    <script>
+        // --- CONFIGURATION ---
+        // ⚠️ REMPLACEZ CETTE URL PAR L'URL DE VOTRE SCRIPT GOOGLE APPS DÉPLOYÉ
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXKYLmByGnlQfWcobIGq3iAYcmcmqdAouGOoh-TJrGK86n_w77UijqoQJSqC8zfpYJ/exec"; 
+
+        // Initialisation de la date par défaut (Aujourd'hui)
+        document.getElementById('dateSeance').valueAsDate = new Date();
+
+        // --- ETAT (STATE) ---
+        let scores = {
+            j1: { total: 0, bonusPts: 0 },
+            j2: { total: 0, bonusPts: 0 }
+        };
+
+        // --- FONCTIONS DE SCORE ---
+
+        function addPoint(player, points) {
+            const key = 'j' + player;
+            scores[key].total += points;
+            updateDisplay();
+        }
+
+        function addBonus(player) {
+            const key = 'j' + player;
+            const bonusVal = parseInt(document.getElementById('valeurBonus').value) || 0;
+            
+            scores[key].bonusPts += bonusVal; // On cumule les points bonus
+            scores[key].total += bonusVal;    // On les ajoute au total
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('displayScoreJ1').textContent = scores.j1.total;
+            document.getElementById('displayBonusJ1').textContent = scores.j1.bonusPts;
+            
+            document.getElementById('displayScoreJ2').textContent = scores.j2.total;
+            document.getElementById('displayBonusJ2').textContent = scores.j2.bonusPts;
+        }
+
+        function resetAll() {
+            if(!confirm("Réinitialiser tous les scores ?")) return;
+
+            // Remise à zéro des variables
+            scores.j1.total = 0;
+            scores.j1.bonusPts = 0;
+            scores.j2.total = 0;
+            scores.j2.bonusPts = 0;
+
+            // Remise à zéro des champs texte (Optionnel, selon préférence, ici on vide tout comme demandé)
+            document.getElementById('nomJ1').value = "";
+            document.getElementById('nomJ2').value = "";
+            
+            // On ne remet pas à zéro la classe, l'activité ou la date car souvent on enchaîne les matchs
+            // dans le même contexte.
+            
+            updateDisplay();
+        }
+
+        // --- ENVOI DES DONNÉES ---
+
+        function sendData() {
+            const btn = document.getElementById('btnSave');
+            const originalText = btn.innerHTML;
+
+            // 1. Validation
+            const activite = document.getElementById('activite').value;
+            const classe = document.getElementById('classe').value; // Récupéré pour le script, même si pas dans colonnes A-H
+            const date = document.getElementById('dateSeance').value;
+            const nomJ1 = document.getElementById('nomJ1').value.trim();
+            const nomJ2 = document.getElementById('nomJ2').value.trim();
+
+            if (!activite || !date || !classe) {
+                alert("Merci de sélectionner une activité, une classe et une date.");
+                return;
+            }
+            if (!nomJ1 && !nomJ2) {
+                alert("Merci d'entrer au moins un nom de joueur.");
+                return;
+            }
+
+            // 2. Préparation des données (Format JSON)
+            const data = {
+                date: date,
+                activite: activite,
+                classe: classe,
+                nomJ1: nomJ1 || "J1",
+                nomJ2: nomJ2 || "J2",
+                scoreJ1: scores.j1.total,
+                scoreJ2: scores.j2.total,
+                bonusJ1: scores.j1.bonusPts,
+                bonusJ2: scores.j2.bonusPts
+            };
+
+            // 3. UI Loading
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Envoi...`;
+
+            // 4. Envoi via fetch (POST)
+            // Note: mode 'no-cors' est nécessaire pour les scripts Google simples sans configuration serveur complexe,
+            // mais cela signifie qu'on ne peut pas lire la réponse JSON. On assume le succès si pas d'erreur réseau.
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                alert("✅ Données enregistrées avec succès !");
+                resetAfterSave(); // Réinit auto après sauvegarde
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("❌ Erreur lors de l'enregistrement. Vérifiez votre connexion.");
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+        }
+
+        function resetAfterSave() {
+            // Après sauvegarde, on vide les scores et les noms pour le match suivant
+            scores.j1.total = 0;
+            scores.j1.bonusPts = 0;
+            scores.j2.total = 0;
+            scores.j2.bonusPts = 0;
+            document.getElementById('nomJ1').value = "";
+            document.getElementById('nomJ2').value = "";
+            updateDisplay();
+        }
+
+    </script>
+</body>
+</html>
